@@ -1,80 +1,76 @@
-// DICHIARAZIONI VARIABILI
-let formInputReference = document.getElementById("register-form");
-let nameInputReference = document.getElementById("inpu-name");
-let surnameInputReference = document.getElementById("inpu-surname");
-let birthdayInputReference = document.getElementById("inpu-born");
-let emailInputReference = document.getElementById("inpu-mail");
-let passwordInputReference = document.getElementById("inpu-pass");
-let saveInputBtnReference = document.getElementById("save");
-let discardInputReference = document.getElementById("reset");
-let loadInputReference = document.getElementById("load");
-let listInputReference = document.getElementById("user-list");
+// VARIABILI
+let formInput = document.getElementById("formText");
+let userInput = document.getElementById("user");
+let saveInput = document.getElementById("save");
+let resetInput = document.getElementById("reset");
+let listInput = document.getElementById("list");
 
-// RENDERE FUNCTION
+//
+
 const renderList = function () {
-  listInputReference.innerHTML = "";
-
-  let archived = [];
-  let savedUsers = localStorage.getItem("archived");
-  if (savedUsers) {
-    archived = JSON.parse(savedUsers);
+  listInput.innerHTML = "";
+  let listUsers = [];
+  let listUsersSaved = localStorage.getItem("listUsers");
+  if (listUsersSaved) {
+    listUsers = JSON.parse(listUsersSaved);
   }
-
-  // SAVE BUTTON
-  const save = function () {
-    const currentText = nameInputReference.value;
-    localStorage.setItem("textAreaValue", currentText);
-  };
-
-  // DISCARD BUTTON
-  const reset = function () {
-    nameInputReference.value = "";
-    surnameInputReference.value = "";
-    birthdayInputReference.value = "";
-    emailInputReference.value = "";
-    passwordInputReference.value = "";
-  };
-
-  // LOAD BUTTON
-  const load = function () {
-    const loadedText = localStorage.getItem("textAreaValue");
-    if (loadedText) {
-      nameInputReference.value = loadedText;
-      surnameInputReference.value = loadedText;
-      birthdayInputReference.value = loadedText;
-      emailInputReference.value = loadedText;
-    } else {
-      console.log("Error");
-    }
-  };
-
-  // CREATE LI
-  archived.forEach((app) => {
+  listUsers.forEach((p) => {
     let newLi = document.createElement("li");
-    newLi.innerText = `${app.nameInputReference} ${app.surnameInputReference} ${app.birthdayInputReference}
-    ${app.emailInputReference}`;
-    listInputReference.appendChild(newLi);
+    newLi.innerText = `${p.name}`;
+    listInput.appendChild(newLi);
   });
 };
 
-// JSON STORAGE
-formInputReference.addEventListener("submit", (e) => {
+const reset = function () {
+  userInput.value = "";
+  console.log("Text area has been resetted");
+};
+
+formInput.addEventListener("submit", (e) => {
   e.preventDefault();
-  let listAllUsers = localStorage.getItem("archived")
-    ? JSON.parse(localStorage.getItem("archived"))
-    : [];
-  listAllUsers.push({
-    name: nameInputReference.value,
-    surname: surnameInputReference.value,
-    date: birthdayInputReference.value,
-    mail: emailInputReference.value,
+  let existingUser = localStorage.getItem("listUsers")
+    ? JSON.parse(localStorage.getItem("listUsers"))
+    : []; // operatore ternario
+
+  existingUser.push({
+    name: userInput.value,
   });
-  localStorage.setItem("archived", JSON.stringify(listAllUsers));
+  localStorage.setItem("listUsers", JSON.stringify(existingUser));
+  userInput.value = "";
   renderList();
 });
 
 renderList();
 
-discardInputReference.addEventListener("click", reset);
-saveInputBtnReference.onclick = save;
-loadInputReference.onclick = load;
+resetInput.addEventListener("click", () => {
+  localStorage.removeItem("listUsers");
+  renderList();
+});
+
+//  contatore
+
+// Recupera il valore attuale del contatore dalla sessionStorage o inizializza a 0
+let counter = sessionStorage.getItem("counter") || 0;
+
+// Recupera l'elemento HTML dove visualizzare il contatore
+const counterDisplay = document.getElementById("counter-display");
+
+// Funzione per aggiornare il valore del contatore ogni secondo
+function updateCounter() {
+  counter++;
+  sessionStorage.setItem("counter", counter);
+  counterDisplay.innerText = counter;
+}
+
+// Avvia il timer che chiama la funzione updateCounter ogni secondo
+const timer = setInterval(updateCounter, 1000);
+
+// Rimuovi il valore della sessionStorage quando la pagina viene ricaricata o chiusa
+window.addEventListener("beforeunload", () => {
+  sessionStorage.removeItem("counter");
+});
+
+// Assicurati di fermare il timer quando la pagina viene chiusa o ricaricata
+window.addEventListener("unload", () => {
+  clearInterval(timer);
+});
